@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { getPrisma } from "../services/database";
+import { signinInput } from "@apophis30/common";
 
 const signIn = new Hono<{
     Bindings: {
@@ -12,7 +13,8 @@ const signIn = new Hono<{
 signIn.post("/signin", async (c) => {
     const prisma = getPrisma(c.env.DATABASE_URL);
     const body = await c.req.json();
-    if (!body.email || !body.password) {
+    const { success } = signinInput.safeParse(body);
+    if (!success) {
         return c.json(
             {
                 message: "Email and Password Are Required Fields",

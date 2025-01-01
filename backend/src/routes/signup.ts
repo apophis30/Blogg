@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { getPrisma } from "../services/database";
+import { signupInput } from "@apophis30/common";
 
 const signUp = new Hono<{
   Bindings: {
@@ -13,8 +14,10 @@ signUp.post("/signup", async (c) => {
 
   const prisma = getPrisma(c.env.DATABASE_URL);
   const body = await c.req.json();
-  if (!body.email || !body.password) {
-    return c.json({ error: "Email and password are required." }, 400);
+  const { success } = signupInput.safeParse(body);
+  if (!success) {
+    c.status(400);
+    return c.json({ error: "Email and password are required." });
   }
   try {
     const existingUser = await prisma.user.findUnique({
