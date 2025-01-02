@@ -1,2 +1,4 @@
 # typescript files
 src/
+tsconfig.json
+tsconfig.tsbuildinfo
